@@ -3,61 +3,78 @@ package edu.sena.bibliotecaspring.controller;
 import edu.sena.bibliotecaspring.model.Libro;
 import edu.sena.bibliotecaspring.service.LibroService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
+import java.util.List;
 
-@Controller
-@RequestMapping("/libros")
+@RestController
+@RequestMapping("/api/libros")
+@CrossOrigin(origins = "http://localhost:3000")
 public class LibroController {
 
     @Autowired
     private LibroService libroService;
 
     @GetMapping
-    public String listarLibros(Model model) {
-        model.addAttribute("libros", libroService.findAll());
-        return "libros/lista";
+    public ResponseEntity<List<Libro>> listarLibros() {
+        List<Libro> libros = libroService.findAll();
+        return ResponseEntity.ok(libros);
     }
 
-    @GetMapping("/nuevo")
-    public String mostrarFormularioNuevo(Model model) {
-        model.addAttribute("libro", new Libro());
-        return "libros/formulario";
+    @PostMapping
+    public ResponseEntity<Libro> crearLibro(@RequestBody Libro libro) {
+        Libro nuevoLibro = libroService.save(libro);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoLibro);
     }
 
-    @PostMapping("/guardar")
-    public String guardarLibro(@ModelAttribute Libro libro) {
-        libroService.save(libro);
-        return "redirect:/libros";
-    }
-
-    @GetMapping("/editar/{id}")
-    public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-        model.addAttribute("libro", libroService.findById(id));
-        return "libros/formulario";
-    }
-
-    @GetMapping("/eliminar/{id}")
-    public String eliminarLibro(@PathVariable Long id) {
-        libroService.deleteById(id);
-        return "redirect:/libros";
-    }
-
-    @GetMapping("/buscar")
-    public String buscarPorTitulo(@RequestParam(required = false) String titulo, 
-                                 @RequestParam(required = false) String autor,
-                                 Model model) {
-        if (titulo != null && !titulo.isEmpty()) {
-            model.addAttribute("libros", libroService.findByTitulo(titulo));
-        } else if (autor != null && !autor.isEmpty()) {
-            model.addAttribute("libros", libroService.findByAutor(autor));
+    @GetMapping("/{id}")
+    public ResponseEntity<Libro> obtenerLibro(@PathVariable Long id) {
+        Libro libro = libroService.findById(id);
+        if (libro != null) {
+            return ResponseEntity.ok(libro);
         } else {
-            model.addAttribute("libros", libroService.findAll());
+            return ResponseEntity.notFound().build();
         }
-        return "libros/lista";
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Libro> actualizarLibro(@PathVariable Long id, @RequestBody Libro libro) {
+        // Verificar que el ID coincida
+        if (!id.equals(libro.getId())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Libro libroActualizado = libroService.update(libro);
+        if (libroActualizado != null) {
+            return ResponseEntity.ok(libroActualizado);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarLibro(@PathVariable Long id) {
+        boolean eliminado = libroService.deleteById(id);
+        if (eliminado) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Método adicional para búsqueda
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Libro>> buscarLibros(
+            @RequestParam(required = false) String titulo,
+            @RequestParam(required = false) String autor) {
+
+        if (titulo != null && !titulo.isEmpty()) {
+            return ResponseEntity.ok(libroService.findByTitulo(titulo));
+        } else if (autor != null && !autor.isEmpty()) {
+            return ResponseEntity.ok(libroService.findByAutor(autor));
+        }
+        return ResponseEntity.ok(libroService.findAll());
     }
 }

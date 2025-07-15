@@ -5,7 +5,7 @@
 El **Sistema de Gestión de Biblioteca** es una aplicación web desarrollada con **Spring Boot** que permite administrar el catálogo de una biblioteca. El sistema facilita la gestión de diferentes tipos de elementos bibliográficos: **libros**, **revistas** y **DVDs**. Con esta aplicación, los bibliotecarios pueden realizar operaciones básicas como agregar, editar, eliminar y buscar elementos en el catálogo.
 
 ## Tecnologías Utilizadas
-
+~~~~
 * **Java**: Lenguaje de programación principal
 * **Spring Boot**: Framework para el desarrollo de aplicaciones Java
 * **Spring Data JPA**: Para la persistencia de datos
