@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-// Configuración global de axios
+const API_URL = 'http://localhost:8080/api'; // Asegúrate que coincide con tu backend
+
 const api = axios.create({
-    baseURL: 'http://localhost:8080/api',
-    timeout: 10000, // 10 segundos de timeout
+    baseURL: API_URL,
+    timeout: 5000,
     headers: {
         'Content-Type': 'application/json'
     }
@@ -13,8 +14,8 @@ const api = axios.create({
 api.interceptors.response.use(
     response => response.data,
     error => {
-        console.error('Error en la petición:', error);
-        throw new Error(error.response?.data?.message || 'Error de conexión con el servidor');
+        console.error('API Error:', error.response?.data || error.message);
+        throw error.response?.data || { message: 'Error de conexión con el servidor' };
     }
 );
 
