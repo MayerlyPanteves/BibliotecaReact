@@ -1,4 +1,4 @@
-package edu.sem.bibliotecaspring.config;
+package edu.sena.biblioteca.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -10,9 +10,8 @@ public class CoreConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:3008")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                .allowedOrigins("http://localhost:3000")  // Puerto de React
+                .allowedMethods("*")
+                .allowedHeaders("*");
     }
 }
